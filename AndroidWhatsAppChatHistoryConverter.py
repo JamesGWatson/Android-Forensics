@@ -30,12 +30,15 @@ for i in os.walk(directory):
         print(str(len(byteArrays)) + " lines.")
 
         for k in byteArrays:
-            groundTester = re.findall(b"^\d\d/\d\d/\d\d\d\d, \d\d\:\d\d -",k)
+            groundTester = re.findall(b"^.{0,2}\d\d/\d\d/\d\d.{0,2}, \d\d\:\d\d -",k)
             if len(groundTester)>0:
                 datetimeLocalString = b" ".join([groundTester[0][:10],re.findall(b", (\d\d\:\d\d) -",k)[0]]).decode("latin-1") 
-                datetimeLocalUnix = int(datetime.datetime.strptime(datetimeLocalString, "%d/%m/%Y %H:%M").timestamp())
+                if groundTester[0][2] == 47: ## confirms dd/mm/yyyy (possibly more common)
+                    datetimeLocalUnix = int(datetime.datetime.strptime(datetimeLocalString, "%d/%m/%Y %H:%M").timestamp())
+                else: ## yyyy/mm/dd
+                    datetimeLocalUnix = int(datetime.datetime.strptime(datetimeLocalString, "%Y/%m/%d %H:%M").timestamp())
                 ## either variable is usable - it depends on intended use
-                
+      
                 senderRaw = re.findall(b"\:\d\d - (.*?)\: ",k)
 
                 if len(senderRaw)>0:
